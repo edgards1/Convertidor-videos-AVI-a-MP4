@@ -3,7 +3,7 @@ from errno import ENOSPC
 import logging
 import uuid
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 from fastapi.responses import FileResponse
 
 from ..services.ffmpeg_service import convert_avi_to_mp4
@@ -38,7 +38,8 @@ def cleanup_file(path: Path) -> None:
 @router.post("/convert")
 async def convert_video(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    quality: str = Form("balanced")
 ) -> FileResponse:
     ensure_dirs()
 
@@ -52,6 +53,10 @@ async def convert_video(
     unique_id = uuid.uuid4().hex
     input_path = TEMP_DIR / f"{unique_id}.avi"
     output_path = OUTPUT_DIR / f"{unique_id}.mp4"
+
+    quality = quality.strip().lower()
+    if quality not in {"low", "balanced", "high"}:
+        raise HTTPException(status_code=400, detail="Calidad invalida")
 
     try:
         logger.info("upload started filename=%s content_type=%s", filename, file.content_type)
@@ -70,8 +75,8 @@ async def convert_video(
 
         logger.info("upload finished bytes=%d", total_bytes)
 
-        logger.info("conversion started input=%s", input_path.name)
-        convert_avi_to_mp4(input_path, output_path)
+        logger.info("conversion started input=%s quality=%s", input_path.name, quality)
+        convert_avi_to_mp4(input_path, output_path, quality)
         logger.info("conversion finished output=%s", output_path.name)
     except FileNotFoundError as exc:
         cleanup_file(input_path)

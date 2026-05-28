@@ -11,6 +11,7 @@ export default function App() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [quality, setQuality] = useState<"low" | "balanced" | "high">("balanced");
 
   const isBusy = status === "uploading" || status === "processing";
 
@@ -36,7 +37,8 @@ export default function App() {
     setStatus("uploading");
 
     try {
-      const blob = await convertVideo(file, (uploadProgress) => {
+      console.log("Enviando datos al API", { filename: file.name, size: file.size, quality });
+      const blob = await convertVideo(file, quality, (uploadProgress) => {
         setProgress(uploadProgress.percent);
         if (uploadProgress.percent >= 90) {
           setStatus("processing");
@@ -74,6 +76,33 @@ export default function App() {
         </header>
 
         <Dropzone file={file} isBusy={isBusy} onFileSelect={handleFileSelect} onError={setError} />
+
+        <div className="flex flex-col gap-2">
+          <span className="text-xs uppercase tracking-[0.35em] text-ink/40">Calidad</span>
+          <div className="flex flex-wrap gap-3">
+            {(
+              [
+                { value: "low", label: "Rapido" },
+                { value: "balanced", label: "Equilibrado" },
+                { value: "high", label: "Mejor calidad" }
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+                  quality === option.value
+                    ? "border-ink bg-ink text-fog"
+                    : "border-ink/20 text-ink hover:-translate-y-0.5 hover:shadow-soft"
+                }`}
+                onClick={() => setQuality(option.value)}
+                disabled={isBusy}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="flex flex-col gap-6">
           <ProgressStatus status={status} progress={progress} message={error ?? undefined} />

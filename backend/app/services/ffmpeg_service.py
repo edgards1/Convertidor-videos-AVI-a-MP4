@@ -5,7 +5,14 @@ from pathlib import Path
 logger = logging.getLogger("ssd.converter")
 
 
-def convert_avi_to_mp4(input_path: Path, output_path: Path) -> None:
+def convert_avi_to_mp4(input_path: Path, output_path: Path, quality: str) -> None:
+    presets = {
+        "low": {"preset": "ultrafast", "crf": "28", "audio": "96k"},
+        "balanced": {"preset": "veryfast", "crf": "26", "audio": "128k"},
+        "high": {"preset": "slow", "crf": "20", "audio": "160k"}
+    }
+    settings = presets.get(quality, presets["balanced"])
+
     command = [
         "ffmpeg",
         "-y",
@@ -15,13 +22,13 @@ def convert_avi_to_mp4(input_path: Path, output_path: Path) -> None:
         "-c:v",
         "libx264",
         "-preset",
-        "veryfast",
+        settings["preset"],
         "-crf",
-        "26",
+        settings["crf"],
         "-c:a",
         "aac",
         "-b:a",
-        "128k",
+        settings["audio"],
         "-movflags",
         "+faststart",
         "-threads",

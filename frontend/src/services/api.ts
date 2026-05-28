@@ -8,10 +8,12 @@ export type UploadProgress = {
 
 export async function convertVideo(
   file: File,
+  quality: "low" | "balanced" | "high",
   onProgress?: (progress: UploadProgress) => void
 ): Promise<Blob> {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("quality", quality);
 
   const response = await axios.post("/api/convert", formData, {
     responseType: "blob",
