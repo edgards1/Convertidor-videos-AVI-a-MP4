@@ -15,7 +15,7 @@ export default function Snackbar({ open, message, tone = "info", onClose }: Snac
   }[tone];
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2">
+    <div className="fixed bottom-6 left-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0">
       <div
         className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 text-sm shadow-soft backdrop-blur ${toneStyles}`}
         role="status"

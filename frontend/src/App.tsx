@@ -76,9 +76,10 @@ export default function App() {
       setStatus("success");
       showSnackbar("Conversion completada. Tu MP4 esta listo.", "success");
     } catch (err) {
-      setError("No se pudo convertir el archivo. Intenta de nuevo.");
+      const message = err instanceof Error ? err.message : "No se pudo convertir el archivo.";
+      setError(message);
       setStatus("error");
-      showSnackbar("Ocurrio un error durante la conversion.", "error");
+      showSnackbar(message, "error");
     }
   };
 
@@ -134,13 +135,15 @@ export default function App() {
         <div className="flex flex-col gap-6">
           <ProgressStatus status={status} progress={progress} message={error ?? undefined} />
           <div className="flex flex-col gap-3 md:items-center">
-            <button
-              className="rounded-full bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-fog transition hover:-translate-y-0.5 hover:shadow-soft disabled:cursor-not-allowed disabled:opacity-50"
-              onClick={handleConvert}
-              disabled={!file || isBusy}
-            >
-              {buttonLabel}
-            </button>
+            {status !== "success" && (
+              <button
+                className="rounded-full bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-fog transition hover:-translate-y-0.5 hover:shadow-soft disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleConvert}
+                disabled={!file || isBusy}
+              >
+                {buttonLabel}
+              </button>
+            )}
             {downloadUrl && status === "success" && (
               <a
                 href={downloadUrl}
