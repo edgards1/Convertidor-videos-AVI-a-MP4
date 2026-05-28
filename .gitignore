@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.env
+backend/app/temp/*
+!backend/app/temp/.gitkeep
+backend/app/output/*
+!backend/app/output/.gitkeep
+.github/

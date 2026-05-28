@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Space Grotesk", "Avenir Next", "Futura", "Helvetica Neue", sans-serif;
+  color: #151515;
+  background-color: #f6f6f2;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(900px 600px at 15% 10%, rgba(21, 21, 21, 0.06), transparent 60%),
+    linear-gradient(160deg, #f6f6f2, #f1f1ed 60%, #eceae4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.progress-bar {
+  background: linear-gradient(120deg, rgba(21, 21, 21, 0.75), rgba(21, 21, 21, 0.9));
+}
+
+.progress-bar--active {
+  background: linear-gradient(120deg, rgba(21, 21, 21, 0.3), rgba(21, 21, 21, 0.85), rgba(21, 21, 21, 0.3));
+  background-size: 200% 100%;
+  animation: progress-shimmer 1.4s ease-in-out infinite;
+}
+
+.loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #151515;
+  opacity: 0.6;
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.9;
+  }
+}

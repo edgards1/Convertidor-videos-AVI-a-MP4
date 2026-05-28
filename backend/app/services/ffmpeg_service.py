@@ -1,0 +1,47 @@
+import logging
+import subprocess
+from pathlib import Path
+
+logger = logging.getLogger("ssd.converter")
+
+
+def convert_avi_to_mp4(input_path: Path, output_path: Path) -> None:
+    command = [
+        "ffmpeg",
+        "-y",
+        "-hide_banner",
+        "-i",
+        str(input_path),
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "26",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-movflags",
+        "+faststart",
+        "-threads",
+        "0",
+        str(output_path)
+    ]
+
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True
+    )
+
+    if process.stdout:
+        for line in process.stdout:
+            line = line.strip()
+            if line:
+                logger.info("ffmpeg: %s", line)
+
+    return_code = process.wait()
+    if return_code != 0:
+        raise RuntimeError("FFmpeg failed")
