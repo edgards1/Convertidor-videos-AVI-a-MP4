@@ -1,6 +1,6 @@
 # AVI to MP4 Converter
 
-Monorepo with frontend (React + Vite) and backend (FastAPI) to convert .avi to .mp4.
+Monorepo creado con frontend (React + Vite) y backend (FastAPI) para convertir videos de .avi a .mp4.
 
 ## Requisitos
 
