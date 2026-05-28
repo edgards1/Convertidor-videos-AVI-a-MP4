@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 from pathlib import Path
 
@@ -13,8 +14,10 @@ def convert_avi_to_mp4(input_path: Path, output_path: Path, quality: str) -> Non
     }
     settings = presets.get(quality, presets["balanced"])
 
+    ffmpeg_cmd = os.getenv("FFMPEG_PATH", "ffmpeg")
+
     command = [
-        "ffmpeg",
+        ffmpeg_cmd,
         "-y",
         "-hide_banner",
         "-i",
