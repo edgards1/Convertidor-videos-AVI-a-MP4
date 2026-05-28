@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Dropzone from "./components/Dropzone";
 import ProgressStatus from "./components/ProgressStatus";
+import Snackbar from "./components/Snackbar";
 import { convertVideo } from "./services/api";
 
 type Status = "idle" | "uploading" | "processing" | "success" | "error";
+type SnackbarTone = "success" | "error" | "info";
 
 export default function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -12,6 +14,14 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [quality, setQuality] = useState<"low" | "balanced" | "high">("balanced");
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; tone: SnackbarTone }>(
+    {
+      open: false,
+      message: "",
+      tone: "info"
+    }
+  );
+  const snackbarTimer = useRef<number | null>(null);
 
   const isBusy = status === "uploading" || status === "processing";
 
@@ -29,6 +39,21 @@ export default function App() {
       URL.revokeObjectURL(downloadUrl);
       setDownloadUrl(null);
     }
+  };
+
+  const showSnackbar = (message: string, tone: SnackbarTone) => {
+    if (snackbarTimer.current) {
+      window.clearTimeout(snackbarTimer.current);
+    }
+    setSnackbar({ open: true, message, tone });
+    snackbarTimer.current = window.setTimeout(() => {
+      setSnackbar((current) => ({ ...current, open: false }));
+    }, 4000);
+  };
+
+  const handleNewFile = () => {
+    handleReset();
+    setFile(null);
   };
 
   const handleConvert = async () => {
@@ -49,9 +74,11 @@ export default function App() {
       setDownloadUrl(url);
       setProgress(100);
       setStatus("success");
+      showSnackbar("Conversion completada. Tu MP4 esta listo.", "success");
     } catch (err) {
       setError("No se pudo convertir el archivo. Intenta de nuevo.");
       setStatus("error");
+      showSnackbar("Ocurrio un error durante la conversion.", "error");
     }
   };
 
@@ -68,7 +95,7 @@ export default function App() {
         <header className="flex flex-col gap-4">
           <span className="text-xs uppercase tracking-[0.45em] text-ink/45">Convertidor AVI a MP4</span>
           <h1 className="text-3xl font-semibold text-ink md:text-4xl">
-            Conversion simple, sin friccion.
+            Conversion rapida y facil de tus videos AVI
           </h1>
           <p className="max-w-2xl text-base text-ink/60">
             Sube tu AVI, espera la conversion y descarga al instante.
@@ -123,9 +150,24 @@ export default function App() {
                 Descargar MP4
               </a>
             )}
+            {status === "success" && (
+              <button
+                type="button"
+                className="rounded-full border border-ink/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink transition hover:-translate-y-0.5 hover:shadow-soft"
+                onClick={handleNewFile}
+              >
+                Cargar otro archivo
+              </button>
+            )}
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        tone={snackbar.tone}
+        onClose={() => setSnackbar((current) => ({ ...current, open: false }))}
+      />
     </div>
   );
 }
